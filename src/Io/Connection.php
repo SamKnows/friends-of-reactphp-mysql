@@ -87,11 +87,13 @@ class Connection extends EventEmitter implements ConnectionInterface
             $rows = array();
 
             $deferred->resolve($result);
+            $this->quit();
         });
 
         // resolve / reject status reply (response without result set)
         $command->on('error', function ($error) use ($deferred) {
             $deferred->reject($error);
+            $this->quit();
         });
         $command->on('success', function () use ($command, $deferred) {
             $result = new QueryResult();
@@ -99,6 +101,7 @@ class Connection extends EventEmitter implements ConnectionInterface
             $result->insertId = $command->insertId;
 
             $deferred->resolve($result);
+            $this->quit();
         });
 
         return $deferred->promise();
